@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resident Evil: Greened Out</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hud-panel">
+      <h1>Resident Evil: Greened Out</h1>
+      <p class="subtitle">A small survival horror prototype</p>
+      <div class="controls">
+        <p><strong>Move:</strong> WASD or Arrow Keys</p>
+        <p><strong>Shoot:</strong> Space</p>
+        <p><strong>Interact:</strong> E</p>
+        <p><strong>Select Item:</strong> 1, 2, 3</p>
+        <p><strong>Use Item:</strong> H</p>
+        <p><strong>Start / Restart:</strong> Enter / R</p>
+      </div>
+    </section>
+
+    <section class="game-frame">
+      <canvas id="game" width="960" height="540" aria-label="Top down survival horror game"></canvas>
+      <div class="scanlines" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
