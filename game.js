@@ -1,5 +1,6 @@
 ﻿const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
@@ -148,7 +149,12 @@ const ROOMS = {
         w: 38,
         h: 38,
         opened: false,
-        forcedLoot: null
+        forcedLoot: {
+          type: "ammo",
+          itemId: "handgun-ammo",
+          label: "Handgun Ammo",
+          amount: 6
+        }
       }
     ],
     zombies: [
@@ -235,7 +241,8 @@ const ROOMS = {
       }
     ],
     zombies: [
-      { x: 640, y: 430, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
+      { x: 640, y: 430, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 },
+      { x: 774, y: 120, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
     ]
   },
   biolab: {
@@ -294,7 +301,8 @@ const ROOMS = {
     ],
     zombies: [
       { x: 682, y: 188, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 },
-      { x: 252, y: 452, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
+      { x: 252, y: 452, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 },
+      { x: 820, y: 412, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
     ]
   }
 };
@@ -1220,48 +1228,112 @@ function drawThemedDetails(room) {
   ctx.stroke();
 }
 
-function drawItem(item) {
-  if (item.type === "key") {
-    ctx.fillStyle = COLORS.key;
+function setUIFont(size, align = "left") {
+  ctx.font = `bold ${size}px "Courier New", monospace`;
+  ctx.textAlign = align;
+}
+
+function fillPixel(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+}
+
+function drawGameIcon(kind, x, y, scale = 1, framed = false) {
+  const s = scale;
+
+  if (framed) {
+    ctx.fillStyle = "rgba(12, 16, 18, 0.88)";
     ctx.beginPath();
-    ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+    ctx.arc(x, y, 15 * s, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = "#f7efbb";
+    ctx.strokeStyle = "rgba(88, 120, 96, 0.8)";
     ctx.lineWidth = 2;
-    ctx.strokeRect(item.x + 8, item.y - 3, 12, 6);
-    return;
+    ctx.stroke();
   }
 
+  switch (kind) {
+    case "key":
+      fillPixel(x - 8 * s, y - 2 * s, 14 * s, 3 * s, "#d9a311");
+      fillPixel(x - 2 * s, y - 6 * s, 3 * s, 11 * s, "#f0c62f");
+      fillPixel(x + 2 * s, y - 1 * s, 3 * s, 6 * s, "#d99510");
+      fillPixel(x + 5 * s, y - 1 * s, 3 * s, 9 * s, "#c4840d");
+      ctx.strokeStyle = "#f7da65";
+      ctx.lineWidth = 2 * s;
+      ctx.beginPath();
+      ctx.arc(x - 9 * s, y - 1 * s, 5 * s, 0, Math.PI * 2);
+      ctx.stroke();
+      break;
+    case "green-herb":
+      fillPixel(x - 2 * s, y - 10 * s, 3 * s, 18 * s, "#4dcf2f");
+      fillPixel(x - 8 * s, y - 5 * s, 7 * s, 4 * s, "#65e040");
+      fillPixel(x - 10 * s, y - 1 * s, 8 * s, 4 * s, "#59c935");
+      fillPixel(x + 1 * s, y - 7 * s, 7 * s, 4 * s, "#69e645");
+      fillPixel(x + 3 * s, y - 1 * s, 8 * s, 4 * s, "#52be31");
+      break;
+    case "mixed-herbs":
+      drawGameIcon("green-herb", x - 3 * s, y + 1 * s, s * 0.9, false);
+      fillPixel(x + 1 * s, y - 10 * s, 3 * s, 18 * s, "#be2b23");
+      fillPixel(x + 4 * s, y - 8 * s, 7 * s, 4 * s, "#ea4937");
+      fillPixel(x + 5 * s, y - 2 * s, 8 * s, 4 * s, "#d53d30");
+      fillPixel(x - 1 * s, y + 2 * s, 7 * s, 4 * s, "#c9312b");
+      break;
+    case "grenade":
+      fillPixel(x - 7 * s, y - 8 * s, 14 * s, 16 * s, "#6c8b31");
+      fillPixel(x - 5 * s, y - 10 * s, 10 * s, 3 * s, "#89ab44");
+      fillPixel(x - 1 * s, y - 13 * s, 7 * s, 3 * s, "#8a8e92");
+      fillPixel(x + 6 * s, y - 11 * s, 3 * s, 10 * s, "#b6bcc0");
+      ctx.strokeStyle = "#42561f";
+      ctx.lineWidth = 1.5 * s;
+      for (let i = -4; i <= 4; i += 4) {
+        ctx.beginPath();
+        ctx.moveTo(x - 7 * s, y + i * s);
+        ctx.lineTo(x + 7 * s, y + i * s);
+        ctx.stroke();
+      }
+      break;
+    case "ammo":
+      fillPixel(x - 10 * s, y - 7 * s, 18 * s, 12 * s, "#3a2825");
+      fillPixel(x - 8 * s, y - 5 * s, 14 * s, 8 * s, "#a32123");
+      fillPixel(x + 7 * s, y + 4 * s, 6 * s, 3 * s, "#c27d2f");
+      fillPixel(x + 12 * s, y + 4 * s, 3 * s, 3 * s, "#edbf67");
+      fillPixel(x - 1 * s, y + 6 * s, 5 * s, 2 * s, "#e2d4ba");
+      break;
+    case "pistol":
+      fillPixel(x - 12 * s, y - 6 * s, 20 * s, 5 * s, "#475056");
+      fillPixel(x - 4 * s, y - 1 * s, 11 * s, 4 * s, "#31373b");
+      fillPixel(x + 2 * s, y + 2 * s, 6 * s, 10 * s, "#24292d");
+      fillPixel(x + 4 * s, y + 10 * s, 4 * s, 3 * s, "#1b1f22");
+      fillPixel(x - 10 * s, y - 2 * s, 5 * s, 2 * s, "#69757c");
+      break;
+    case "zombie":
+      fillPixel(x - 7 * s, y - 8 * s, 14 * s, 16 * s, "#8ea17f");
+      fillPixel(x - 8 * s, y - 12 * s, 8 * s, 5 * s, "#a23c35");
+      fillPixel(x - 4 * s, y - 1 * s, 3 * s, 3 * s, "#210e0a");
+      fillPixel(x + 2 * s, y - 1 * s, 3 * s, 3 * s, "#210e0a");
+      fillPixel(x - 2 * s, y + 5 * s, 6 * s, 3 * s, "#782118");
+      break;
+    default:
+      break;
+  }
+}
+
+function getItemIconKind(item) {
+  if (item.type === "key") {
+    return "key";
+  }
   if (item.type === "grenade") {
-    ctx.fillStyle = COLORS.grenade;
-    ctx.beginPath();
-    ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "#dffdf6";
-    ctx.strokeRect(item.x - 3, item.y - 12, 6, 7);
-    return;
+    return "grenade";
   }
-
   if (item.type === "ammo") {
-    ctx.fillStyle = COLORS.ammoPickup;
-    ctx.fillRect(item.x - 8, item.y - 8, 16, 16);
-    ctx.strokeStyle = "#fff3c5";
-    ctx.strokeRect(item.x - 8, item.y - 8, 16, 16);
-    return;
+    return "ammo";
   }
-
-  ctx.fillStyle = item.itemId === "mixed-herbs" ? COLORS.mixedHeal : COLORS.heal;
-  ctx.beginPath();
-  ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#d9fbe1";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(item.x - 5, item.y);
-  ctx.lineTo(item.x + 5, item.y);
-  ctx.moveTo(item.x, item.y - 5);
-  ctx.lineTo(item.x, item.y + 5);
-  ctx.stroke();
+  if (item.itemId === "mixed-herbs") {
+    return "mixed-herbs";
+  }
+  return "green-herb";
+}
+function drawItem(item) {
+  drawGameIcon(getItemIconKind(item), item.x, item.y, 0.9, true);
 }
 
 function drawRoom() {
@@ -1443,6 +1515,8 @@ function drawLighting() {
 }
 
 function drawHud() {
+  const livingThreats = getCurrentRoom().zombies.filter((zombie) => zombie.alive).length;
+
   ctx.fillStyle = COLORS.uiPanel;
   ctx.fillRect(18, 18, 255, 110);
   ctx.strokeStyle = COLORS.uiBorder;
@@ -1450,22 +1524,26 @@ function drawHud() {
   ctx.strokeRect(18, 18, 255, 110);
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 18px Trebuchet MS";
-  ctx.fillText("STATUS", 34, 44);
+  setUIFont(16);
+  ctx.fillText("STATUS", 34, 42);
 
   ctx.fillStyle = COLORS.textDim;
-  ctx.font = "15px Trebuchet MS";
-  ctx.fillText("Health", 34, 70);
+  setUIFont(12);
+  ctx.fillText("HP", 34, 68);
 
   ctx.fillStyle = COLORS.healthBack;
-  ctx.fillRect(92, 56, 150, 16);
+  ctx.fillRect(72, 56, 170, 16);
   ctx.fillStyle = COLORS.health;
-  ctx.fillRect(92, 56, 150 * (state.player.health / PLAYER_MAX_HEALTH), 16);
+  ctx.fillRect(72, 56, 170 * (state.player.health / PLAYER_MAX_HEALTH), 16);
 
-  ctx.fillStyle = COLORS.textDim;
-  ctx.fillText("Ammo", 34, 98);
+  drawGameIcon("pistol", 47, 96, 0.8, false);
   ctx.fillStyle = COLORS.ammo;
-  ctx.fillText(String(state.player.ammo).padStart(2, "0"), 92, 98);
+  setUIFont(12);
+  ctx.fillText(String(state.player.ammo).padStart(2, "0"), 72, 98);
+
+  drawGameIcon("zombie", 168, 96, 0.72, true);
+  ctx.fillStyle = COLORS.textDim;
+  ctx.fillText(String(livingThreats), 192, 98);
 
   ctx.fillStyle = COLORS.uiPanel;
   ctx.fillRect(WIDTH - 302, 18, 284, 152);
@@ -1473,12 +1551,12 @@ function drawHud() {
   ctx.strokeRect(WIDTH - 302, 18, 284, 152);
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 18px Trebuchet MS";
-  ctx.fillText("INVENTORY", WIDTH - 286, 44);
+  setUIFont(16);
+  ctx.fillText("INVENTORY", WIDTH - 286, 42);
 
   ctx.fillStyle = COLORS.textDim;
-  ctx.font = "15px Trebuchet MS";
-  ctx.fillText(getCurrentRoom().name, WIDTH - 286, 70);
+  setUIFont(11);
+  ctx.fillText(getCurrentRoom().name.toUpperCase(), WIDTH - 286, 68);
 
   for (let i = 0; i < INVENTORY_LIMIT; i += 1) {
     const slotX = WIDTH - 286;
@@ -1490,19 +1568,14 @@ function drawHud() {
 
     const item = state.player.inventory[i];
     if (item) {
-      if (item.type === "healing") {
-        ctx.fillStyle = item.itemId === "mixed-herbs" ? COLORS.mixedHeal : COLORS.heal;
-      } else if (item.type === "key") {
-        ctx.fillStyle = COLORS.key;
-      } else if (item.type === "grenade") {
-        ctx.fillStyle = COLORS.grenade;
-      } else {
-        ctx.fillStyle = COLORS.ammo;
-      }
-      ctx.fillText(`${i + 1}. ${item.label}`, slotX + 8, slotY + 14);
+      drawGameIcon(getItemIconKind(item), slotX + 14, slotY + 9, 0.45, false);
+      ctx.fillStyle = "#d9ddd8";
+      setUIFont(10);
+      ctx.fillText(`${i + 1}. ${item.label.toUpperCase()}`, slotX + 28, slotY + 13);
     } else {
       ctx.fillStyle = "rgba(200, 200, 200, 0.25)";
-      ctx.fillText(`${i + 1}. Empty`, slotX + 8, slotY + 14);
+      setUIFont(10);
+      ctx.fillText(`${i + 1}. EMPTY`, slotX + 8, slotY + 13);
     }
   }
 
@@ -1511,7 +1584,8 @@ function drawHud() {
   ctx.strokeStyle = COLORS.uiBorder;
   ctx.strokeRect(18, HEIGHT - 72, 470, 40);
   ctx.fillStyle = COLORS.textDim;
-  ctx.fillText(state.message || "Explore carefully.", 34, HEIGHT - 46);
+  setUIFont(11);
+  ctx.fillText((state.message || "Explore carefully.").toUpperCase(), 34, HEIGHT - 46);
 }
 
 function drawOverlay(title, subtitle, prompt) {
@@ -1525,12 +1599,12 @@ function drawOverlay(title, subtitle, prompt) {
   ctx.strokeRect(WIDTH / 2 - 260, HEIGHT / 2 - 126, 520, 252);
 
   ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 36px Trebuchet MS";
+  ctx.font = "bold 36px Courier New";
   ctx.textAlign = "center";
   ctx.fillText(title, WIDTH / 2, HEIGHT / 2 - 34);
 
   ctx.fillStyle = COLORS.textDim;
-  ctx.font = "18px Trebuchet MS";
+  ctx.font = "18px Courier New";
   ctx.fillText(subtitle, WIDTH / 2, HEIGHT / 2 + 10);
   ctx.fillText(prompt, WIDTH / 2, HEIGHT / 2 + 52);
   ctx.textAlign = "left";
@@ -1582,11 +1656,11 @@ function render() {
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 34px Trebuchet MS";
+    ctx.font = "bold 34px Courier New";
     ctx.fillText("Resident Evil: Greened Out", WIDTH / 2, HEIGHT / 2 - 48);
 
     ctx.fillStyle = COLORS.textDim;
-    ctx.font = "17px Trebuchet MS";
+    ctx.font = "17px Courier New";
     drawWrappedCenteredText(
       "Shoot crates for loot, find the key, clear the treatment wing, and survive the biolab.",
       WIDTH / 2,
@@ -1595,7 +1669,7 @@ function render() {
       28
     );
 
-    ctx.font = "bold 18px Trebuchet MS";
+    ctx.font = "bold 18px Courier New";
     ctx.fillText("Press Enter to begin", WIDTH / 2, HEIGHT / 2 + 88);
     ctx.textAlign = "left";
     return;
@@ -1627,6 +1701,14 @@ function frame(timestamp) {
 
 resetGame();
 requestAnimationFrame(frame);
+
+
+
+
+
+
+
+
 
 
 
