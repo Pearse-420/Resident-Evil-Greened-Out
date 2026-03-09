@@ -1,4 +1,5 @@
 ﻿const canvas = document.getElementById("game");
+const dropItemButton = document.getElementById("drop-item-button");
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
@@ -71,14 +72,14 @@ const ZOMBIE_ATTACK_DAMAGE = 10;
 const ZOMBIE_ATTACK_COOLDOWN = 1.05;
 
 const ICON_PATHS = {
-  key: "assets/icons/key.svg",
-  "green-herb": "assets/icons/green-herb.svg",
-  "mixed-herbs": "assets/icons/mixed-herbs.svg",
-  grenade: "assets/icons/grenade.svg",
-  ammo: "assets/icons/ammo.svg",
-  pistol: "assets/icons/pistol.svg",
-  zombie: "assets/icons/zombie.svg",
-  player: "assets/icons/player.svg"
+  key: "assets/icons/key.svg?v=20260309b",
+  "green-herb": "assets/icons/green-herb.svg?v=20260309b",
+  "mixed-herbs": "assets/icons/mixed-herbs.svg?v=20260309b",
+  grenade: "assets/icons/grenade.svg?v=20260309b",
+  ammo: "assets/icons/ammo.svg?v=20260309b",
+  pistol: "assets/icons/pistol.svg?v=20260309b",
+  zombie: "assets/icons/zombie.svg?v=20260309b",
+  player: "assets/icons/player.svg?v=20260309b"
 };
 
 const iconImages = {};
@@ -521,6 +522,16 @@ window.addEventListener("keydown", (event) => {
 window.addEventListener("keyup", (event) => {
   state.keys[event.key.toLowerCase()] = false;
 });
+
+if (dropItemButton) {
+  dropItemButton.addEventListener("click", () => {
+    unlockAudio();
+    if (state.screen !== "play" || state.gameOver || state.victory) {
+      return;
+    }
+    dropSelectedItem();
+  });
+}
 
 function cloneRooms() {
   return JSON.parse(JSON.stringify(ROOMS));
@@ -1369,6 +1380,14 @@ function drawGameIcon(kind, x, y, scale = 1, framed = false) {
       fillPixel(x - 4 * s, y - 1 * s, 3 * s, 3 * s, "#210e0a");
       fillPixel(x + 2 * s, y - 1 * s, 3 * s, 3 * s, "#210e0a");
       fillPixel(x - 2 * s, y + 5 * s, 6 * s, 3 * s, "#782118");
+      break;
+    case "player":
+      fillPixel(x - 5 * s, y - 11 * s, 10 * s, 6 * s, "#d4bc98");
+      fillPixel(x - 6 * s, y - 5 * s, 12 * s, 10 * s, "#324a6c");
+      fillPixel(x - 8 * s, y - 3 * s, 3 * s, 7 * s, "#8d5f45");
+      fillPixel(x + 5 * s, y - 3 * s, 3 * s, 7 * s, "#8d5f45");
+      fillPixel(x - 5 * s, y + 5 * s, 4 * s, 9 * s, "#1f2430");
+      fillPixel(x + 1 * s, y + 5 * s, 4 * s, 9 * s, "#1f2430");
       break;
     default:
       break;

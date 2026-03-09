@@ -102,3 +102,24 @@ canvas {
 }
 
 
+
+.action-button {
+  margin-top: 14px;
+  border: 1px solid rgba(185, 44, 44, 0.55);
+  background: linear-gradient(180deg, #262b33 0%, #12161b 100%);
+  color: #d7d5d0;
+  font: bold 0.9rem "Courier New", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+.action-button:hover {
+  background: linear-gradient(180deg, #313844 0%, #171b21 100%);
+}
+
+.action-button:active {
+  transform: translateY(1px);
+}
