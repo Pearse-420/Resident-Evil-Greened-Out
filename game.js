@@ -72,14 +72,14 @@ const ZOMBIE_ATTACK_DAMAGE = 10;
 const ZOMBIE_ATTACK_COOLDOWN = 1.05;
 
 const ICON_PATHS = {
-  key: "assets/icons/Brass_Key.png?v=20260309c",
-  "green-herb": "assets/icons/green-herb.svg?v=20260309c",
-  "mixed-herbs": "assets/icons/mixed-herbs.svg?v=20260309c",
-  grenade: "assets/icons/Grenade.png?v=20260309c",
-  ammo: "assets/icons/Ammo.png?v=20260309c",
-  pistol: "assets/icons/pistol.svg?v=20260309c",
-  zombie: "assets/icons/zombie.svg?v=20260309c",
-  player: "assets/icons/player.png?v=20260309c"
+  key: "assets/icons/Brass_Key.png?v=20260309d",
+  "green-herb": "assets/icons/green-herb.svg?v=20260309d",
+  "mixed-herbs": "assets/icons/mixed-herbs.svg?v=20260309d",
+  grenade: "assets/icons/Grenade.png?v=20260309d",
+  ammo: "assets/icons/Ammo.png?v=20260309d",
+  pistol: "assets/icons/pistol.svg?v=20260309d",
+  zombie: "assets/icons/zombie.svg?v=20260309d",
+  player: "assets/icons/player.png?v=20260309d"
 };
 
 const iconImages = {};
