@@ -1,0 +1,8 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <rect width="32" height="32" rx="16" fill="#101615"/>
+  <rect x="5" y="9" width="18" height="12" fill="#2c2220" stroke="#111" stroke-width="1"/>
+  <rect x="6" y="10" width="16" height="4" fill="#af2022"/>
+  <text x="14" y="19" font-family="monospace" font-size="5" text-anchor="middle" fill="#ebe1c5">AMMO</text>
+  <rect x="22" y="18" width="7" height="4" rx="2" fill="#bb7b2c"/>
+  <rect x="28" y="18" width="2" height="4" fill="#efc56b"/>
+</svg>

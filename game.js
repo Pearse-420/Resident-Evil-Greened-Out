@@ -65,11 +65,30 @@ const EXPLOSION_TIME = 0.18;
 const ZOMBIE_SPEED = 62;
 const ZOMBIE_RADIUS = 18;
 const ZOMBIE_HEALTH = 3;
-const ZOMBIE_DETECTION_RANGE = 240;
+const ZOMBIE_DETECTION_RANGE = 2000;
 const ZOMBIE_ATTACK_RANGE = 24;
 const ZOMBIE_ATTACK_DAMAGE = 10;
 const ZOMBIE_ATTACK_COOLDOWN = 1.05;
 
+const ICON_PATHS = {
+  key: "assets/icons/key.svg",
+  "green-herb": "assets/icons/green-herb.svg",
+  "mixed-herbs": "assets/icons/mixed-herbs.svg",
+  grenade: "assets/icons/grenade.svg",
+  ammo: "assets/icons/ammo.svg",
+  pistol: "assets/icons/pistol.svg",
+  zombie: "assets/icons/zombie.svg"
+};
+
+const iconImages = {};
+
+function preloadIcons() {
+  for (const [key, src] of Object.entries(ICON_PATHS)) {
+    const image = new Image();
+    image.src = src;
+    iconImages[key] = image;
+  }
+}
 const LOOT_TABLE = [
   {
     type: "healing",
@@ -1701,6 +1720,7 @@ function frame(timestamp) {
 
 resetGame();
 requestAnimationFrame(frame);
+
 
 
 
