@@ -77,7 +77,8 @@ const ICON_PATHS = {
   grenade: "assets/icons/grenade.svg",
   ammo: "assets/icons/ammo.svg",
   pistol: "assets/icons/pistol.svg",
-  zombie: "assets/icons/zombie.svg"
+  zombie: "assets/icons/zombie.svg",
+  player: "assets/icons/player.svg"
 };
 
 const iconImages = {};
@@ -652,6 +653,33 @@ function triggerExplosion(x, y) {
   state.effects.push({ x, y, radius: GRENADE_RADIUS, timer: EXPLOSION_TIME, maxTimer: EXPLOSION_TIME });
 }
 
+function dropSelectedItem() {
+  const item = findSelectedItem();
+
+  if (!item) {
+    showMessage("No item selected.");
+    return;
+  }
+
+  const room = getCurrentRoom();
+  const length = Math.hypot(state.player.facingX, state.player.facingY) || 1;
+  const dropDistance = state.player.radius + 20;
+  const dropX = clamp(state.player.x + (state.player.facingX / length) * dropDistance, 28, WIDTH - 28);
+  const dropY = clamp(state.player.y + (state.player.facingY / length) * dropDistance, 28, HEIGHT - 28);
+
+  room.items.push({
+    ...item,
+    x: dropX,
+    y: dropY,
+    radius: item.radius || 12,
+    picked: false
+  });
+
+  state.player.inventory.splice(state.player.selectedSlot, 1);
+  state.player.selectedSlot = clamp(state.player.selectedSlot, 0, Math.max(state.player.inventory.length - 1, 0));
+  showMessage(item.label + " dropped.");
+}
+
 function useSelectedItem() {
   const item = findSelectedItem();
 
@@ -938,6 +966,10 @@ function updatePlayer(dt) {
 
   if (justPressed("h")) {
     useSelectedItem();
+  }
+
+  if (justPressed("q")) {
+    dropSelectedItem();
   }
 
   handleInteractions();
@@ -1270,6 +1302,13 @@ function drawGameIcon(kind, x, y, scale = 1, framed = false) {
     ctx.stroke();
   }
 
+  const image = iconImages[kind];
+  if (image && image.complete && image.naturalWidth > 0) {
+    const size = framed ? 24 * s : 28 * s;
+    ctx.drawImage(image, x - size / 2, y - size / 2, size, size);
+    return;
+  }
+
   switch (kind) {
     case "key":
       fillPixel(x - 8 * s, y - 2 * s, 14 * s, 3 * s, "#d9a311");
@@ -1437,19 +1476,16 @@ function drawPlayer() {
   ctx.ellipse(0, 14, 17, 9, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = COLORS.player;
-  ctx.beginPath();
-  ctx.arc(0, 0, state.player.radius, 0, Math.PI * 2);
-  ctx.fill();
+  drawGameIcon("player", 0, 0, 1, false);
 
   const facingLength = Math.hypot(state.player.facingX, state.player.facingY) || 1;
   ctx.strokeStyle = COLORS.playerAccent;
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(0, 0);
+  ctx.moveTo(0, -2);
   ctx.lineTo(
-    (state.player.facingX / facingLength) * 24,
-    (state.player.facingY / facingLength) * 24
+    (state.player.facingX / facingLength) * 20,
+    (state.player.facingY / facingLength) * 20
   );
   ctx.stroke();
 
@@ -1472,14 +1508,7 @@ function drawZombies() {
     ctx.ellipse(0, 16, 18, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = COLORS.zombie;
-    ctx.beginPath();
-    ctx.arc(0, 0, zombie.radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = COLORS.zombieDark;
-    ctx.fillRect(-6, -5, 12, 18);
-    ctx.fillRect(-10, -17, 20, 10);
+    drawGameIcon("zombie", 0, -1, 1, false);
 
     ctx.restore();
   }
@@ -1720,6 +1749,7 @@ function frame(timestamp) {
 
 resetGame();
 requestAnimationFrame(frame);
+
 
 
 
