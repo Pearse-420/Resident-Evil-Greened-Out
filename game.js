@@ -1495,7 +1495,19 @@ function drawPlayer() {
   ctx.ellipse(0, 14, 17, 9, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  drawGameIcon("player", 0, 0, 1, false);
+  const playerImage = iconImages.player;
+  if (playerImage && playerImage.complete && playerImage.naturalWidth > 0) {
+    ctx.drawImage(playerImage, -18, -18, 36, 36);
+  } else {
+    // Keep a simple temporary silhouette if the custom sprite somehow fails to load.
+    ctx.fillStyle = "#d4d8e0";
+    ctx.fillRect(-6, -14, 12, 10);
+    ctx.fillStyle = "#304f7f";
+    ctx.fillRect(-8, -4, 16, 12);
+    ctx.fillStyle = "#1f2430";
+    ctx.fillRect(-6, 8, 4, 10);
+    ctx.fillRect(2, 8, 4, 10);
+  }
 
   const facingLength = Math.hypot(state.player.facingX, state.player.facingY) || 1;
   ctx.strokeStyle = COLORS.playerAccent;
