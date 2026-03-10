@@ -30,7 +30,7 @@ const COLORS = {
   zombie: "#8aa16b",
   zombieDark: "#5d7048",
   bullet: "#ffcb6b",
-  uiPanel: "rgba(8, 9, 12, 0.5)",
+  uiPanel: "rgba(8, 9, 12, 0.18)",
   uiBorder: "rgba(191, 53, 53, 0.3)",
   health: "#b93d3d",
   healthBack: "#331919",
