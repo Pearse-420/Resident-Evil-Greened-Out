@@ -179,7 +179,7 @@ const ROOMS = {
       }
     ],
     zombies: [
-      { x: 750, y: 190, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
+      { x: 720, y: 160, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
     ]
   },
   treatmentWing: {
