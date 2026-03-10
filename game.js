@@ -262,8 +262,8 @@ const ROOMS = {
       }
     ],
     zombies: [
-      { x: 640, y: 430, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 },
-      { x: 774, y: 120, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
+      { x: 630, y: 440, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 },
+      { x: 740, y: 110, radius: ZOMBIE_RADIUS, health: ZOMBIE_HEALTH, alive: true, attackTimer: 0 }
     ]
   },
   biolab: {
