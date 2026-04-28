@@ -1,4 +1,4 @@
-﻿const canvas = document.getElementById("game");
+const canvas = document.getElementById("game");
 const dropItemButton = document.getElementById("drop-item-button");
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
@@ -352,6 +352,7 @@ const state = {
   transitionTimer: 0,
   gameOver: false,
   victory: false,
+  runTime: 0,
   lastTime: 0,
   audio: {
     context: null,
@@ -574,6 +575,7 @@ function resetGame() {
   state.transitionTimer = 0;
   state.gameOver = false;
   state.victory = false;
+  state.runTime = 0;
 }
 
 function keyDown(...keys) {
@@ -586,6 +588,13 @@ function justPressed(key) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function formatRunTime(seconds) {
+  const totalSeconds = Math.max(0, Math.floor(seconds));
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainder = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
 }
 
 function distanceSquared(ax, ay, bx, by) {
@@ -1109,6 +1118,7 @@ function update(dt) {
   }
 
   if (!state.gameOver && !state.victory) {
+    state.runTime += dt;
     if (state.transitionTimer > 0) {
       state.transitionTimer -= dt;
     } else {
@@ -1597,10 +1607,10 @@ function drawHud() {
   const livingThreats = getCurrentRoom().zombies.filter((zombie) => zombie.alive).length;
 
   ctx.fillStyle = COLORS.uiPanel;
-  ctx.fillRect(18, 18, 255, 110);
+  ctx.fillRect(18, 18, 255, 132);
   ctx.strokeStyle = COLORS.uiBorder;
   ctx.lineWidth = 2;
-  ctx.strokeRect(18, 18, 255, 110);
+  ctx.strokeRect(18, 18, 255, 132);
 
   ctx.fillStyle = "#ffffff";
   setUIFont(16);
@@ -1623,6 +1633,10 @@ function drawHud() {
   drawGameIcon("zombie", 168, 96, 0.72, true);
   ctx.fillStyle = COLORS.textDim;
   ctx.fillText(String(livingThreats), 192, 98);
+
+  ctx.fillStyle = COLORS.textDim;
+  setUIFont(11);
+  ctx.fillText(`TIME ${formatRunTime(state.runTime)}`, 34, 124);
 
   ctx.fillStyle = COLORS.uiPanel;
   ctx.fillRect(WIDTH - 302, 18, 284, 152);
@@ -1667,7 +1681,7 @@ function drawHud() {
   ctx.fillText((state.message || "Explore carefully.").toUpperCase(), 34, HEIGHT - 46);
 }
 
-function drawOverlay(title, subtitle, prompt) {
+function drawOverlay(title, subtitle, prompt, detail = "") {
   ctx.fillStyle = "rgba(0, 0, 0, 0.76)";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
@@ -1680,12 +1694,21 @@ function drawOverlay(title, subtitle, prompt) {
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 36px Courier New";
   ctx.textAlign = "center";
-  ctx.fillText(title, WIDTH / 2, HEIGHT / 2 - 34);
+  ctx.fillText(title, WIDTH / 2, HEIGHT / 2 - 38);
 
   ctx.fillStyle = COLORS.textDim;
-  ctx.font = "18px Courier New";
-  ctx.fillText(subtitle, WIDTH / 2, HEIGHT / 2 + 10);
-  ctx.fillText(prompt, WIDTH / 2, HEIGHT / 2 + 52);
+  ctx.font = "17px Courier New";
+  drawWrappedCenteredText(subtitle, WIDTH / 2, HEIGHT / 2 - 8, 420, 24);
+
+  if (detail) {
+    ctx.fillStyle = "#d8d2a2";
+    ctx.font = "bold 18px Courier New";
+    ctx.fillText(detail, WIDTH / 2, HEIGHT / 2 + 34);
+  }
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 18px Courier New";
+  ctx.fillText(prompt, WIDTH / 2, HEIGHT / 2 + 78);
   ctx.textAlign = "left";
 }
 
@@ -1763,9 +1786,9 @@ function render() {
   drawHud();
 
   if (state.gameOver) {
-    drawOverlay("Game Over", "Vital signs lost inside the facility.", "Press R to restart the run");
+    drawOverlay("Game Over", "Vital signs lost inside the facility.", "Press R to restart the run", `Time ${formatRunTime(state.runTime)}`);
   } else if (state.victory) {
-    drawOverlay("Area Secure", "The infected in all three rooms are down.", "Press R to run it again");
+    drawOverlay("Area Secure", "The infected in all three rooms are down.", "Press R to run it again", `Clear Time ${formatRunTime(state.runTime)}`);
   }
 }
 
@@ -1781,3 +1804,4 @@ function frame(timestamp) {
 preloadIcons();
 resetGame();
 requestAnimationFrame(frame);
+
