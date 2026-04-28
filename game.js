@@ -597,6 +597,24 @@ function formatRunTime(seconds) {
   return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
 }
 
+function getStarRating(seconds) {
+  if (seconds <= 40) {
+    return 3;
+  }
+  if (seconds <= 50) {
+    return 2;
+  }
+  if (seconds <= 60) {
+    return 1;
+  }
+  return 0;
+}
+
+function getStarLabel(seconds) {
+  const stars = getStarRating(seconds);
+  return stars > 0 ? "*".repeat(stars) + "-".repeat(3 - stars) : "NO STARS";
+}
+
 function distanceSquared(ax, ay, bx, by) {
   const dx = ax - bx;
   const dy = ay - by;
@@ -1788,7 +1806,7 @@ function render() {
   if (state.gameOver) {
     drawOverlay("Game Over", "Vital signs lost inside the facility.", "Press R to restart the run", `Time ${formatRunTime(state.runTime)}`);
   } else if (state.victory) {
-    drawOverlay("Area Secure", "The infected in all three rooms are down.", "Press R to run it again", `Clear Time ${formatRunTime(state.runTime)}`);
+    drawOverlay("Area Secure", `The infected in all three rooms are down. Rating ${getStarLabel(state.runTime)}`, "Press R to run it again", `Clear Time ${formatRunTime(state.runTime)}`);
   }
 }
 
@@ -1804,4 +1822,7 @@ function frame(timestamp) {
 preloadIcons();
 resetGame();
 requestAnimationFrame(frame);
+
+
+
 
