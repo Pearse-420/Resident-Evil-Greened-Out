@@ -1777,7 +1777,7 @@ function render() {
     ctx.textAlign = "center";
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 34px Courier New";
-    ctx.fillText("Resident Evil: Greened Out", WIDTH / 2, HEIGHT / 2 - 48);
+    ctx.fillText("S.T.A.R.S: Final Extraction", WIDTH / 2, HEIGHT / 2 - 48);
 
     ctx.fillStyle = COLORS.textDim;
     ctx.font = "17px Courier New";
@@ -1822,6 +1822,7 @@ function frame(timestamp) {
 preloadIcons();
 resetGame();
 requestAnimationFrame(frame);
+
 
 
 
